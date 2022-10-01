@@ -1,0 +1,16 @@
+server:
+  port: 8080
+  servlet:
+    session:
+      cookie:
+        secure: true
+        http-only: true
+      tracking-modes: COOKIE
+  shutdown: graceful
+spring:
+  application:
+    name: midterm
+  datasource:
+    url: jdbc:mysql://localhost:3306/sample_db
+    username: user
+    password: password
