@@ -9,6 +9,8 @@ export type UserCredentials = {
     password: string;
 };
 
-export const loginWithCredentials = (credentials: UserCredentials) => httpClient.get(`/api/user/login/?username=${credentials.username}&password=${credentials.password}`);
+export const loginWithCredentials = (credentials: UserCredentials) =>
+    httpClient.get(`/api/user/${credentials.password}/${credentials.username}/login`);
 
-export const registerWithCredentials = (credentials: UserCredentials) => httpClient.get(`/api/user/register/?username=${credentials.username}&password=${credentials.password}`);
+export const registerWithCredentials = (credentials: UserCredentials) =>
+    httpClient.get(`/api/user/${credentials.password}/${credentials.username}/register`);
