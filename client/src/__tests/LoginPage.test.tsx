@@ -1,9 +1,9 @@
 import LoginPage from '../LoginPage';
 import * as UserApi from "../userApi";
+import {loginWithCredentials, registerWithCredentials} from "../userApi";
 import {render, screen, waitFor} from "@testing-library/react";
 import {describe, expect, it, vi} from "vitest";
 import userEvent from "@testing-library/user-event";
-import {loginWithCredentials, registerWithCredentials} from "../userApi";
 
 describe('LoginPage', () => {
     vi.spyOn(UserApi, 'loginWithCredentials').mockImplementation((credentials) => Promise.resolve({
@@ -15,55 +15,84 @@ describe('LoginPage', () => {
         data: {username: credentials.username}
     }));
 
-    const renderLoginPage = (trueOrFalse = false) => render(
+    const renderLoginPage = () => render(
         <LoginPage
-            setCurrentUser={(_user) => {}}
-            failedLoginAttempt={trueOrFalse}
-            setFailedLoginAttempt={(_trueOrFalse) => {}}
+            setCurrentUser={(_user) => {
+            }}
         />
     );
 
     it('allows a user to login', async () => {
         renderLoginPage();
 
-        const loginPage = screen.getByTestId('login-page');
-        expect(loginPage).toHaveTextContent('My Application');
-        expect(loginPage).toHaveTextContent('Create an Account');
-        expect(loginPage).toHaveTextContent('Sign in');
-        expect(loginPage).not.toHaveTextContent('Error fetching user with the credentials provided...')
-        expect(loginPage).not.toHaveTextContent('Ensure your credentials are correct and try again')
-        await userEvent.click(screen.getByRole('button', {name: 'Sign in'}));
-        await userEvent.type(await screen.findByLabelText('Username:'), 'johndoe');
+        const loginPage = await screen.findByTestId('login-page');
+        expect(loginPage).toHaveTextContent('Welcome!');
+        expect(loginPage).toHaveTextContent('WARNING: password is transferred and stored as plain text.');
+        expect(loginPage).toHaveTextContent('DO NOT use a sensitive password!');
+
+        await userEvent.type(screen.getByLabelText('Username:'), 'johndoe');
         await userEvent.type(screen.getByLabelText('Password:'), 'cmplxpswd');
-        await userEvent.click(screen.getByRole('button', {name: 'SUBMIT'}));
+        await userEvent.click(screen.getByRole('button', {name: 'Sign in'}));
 
-        await waitFor(() => expect(screen.queryByLabelText('Username:')).toBeNull())
+        await waitFor(() => expect(loginWithCredentials).toHaveBeenCalledTimes(1));
 
-        expect(loginWithCredentials).toHaveBeenCalledTimes(1);
         expect(loginWithCredentials).toHaveBeenCalledWith({username: 'johndoe', password: 'cmplxpswd'});
     });
 
     it('allows a user to register', async () => {
         renderLoginPage();
 
-        await userEvent.click(screen.getByRole('button', {name: 'Create an Account'}));
-        expect(await screen.findByText('warning: password is transferred and stored as plain text. DO NOT use a sensitive password!')).toBeInTheDocument();
         await userEvent.type(screen.getByLabelText('Username:'), 'janedoe');
         await userEvent.type(screen.getByLabelText('Password:'), 'passwordispassword');
-        await userEvent.click(screen.getByRole('button', {name: 'SUBMIT'}));
+        await userEvent.click(screen.getByRole('button', {name: 'Create an Account'}));
 
-        await waitFor(() => expect(screen.queryByLabelText('Username:')).toBeNull())
-
-        expect(registerWithCredentials).toHaveBeenCalledTimes(1);
+        await waitFor(() => expect(registerWithCredentials).toHaveBeenCalledTimes(1));
         expect(registerWithCredentials).toHaveBeenCalledWith({username: 'janedoe', password: 'passwordispassword'});
     });
 
     it('handles when a user is not found', async () => {
-        renderLoginPage(true);
+        vi.spyOn(UserApi, 'loginWithCredentials').mockImplementation((credentials) =>
+            Promise.reject({status: 404}));
+
+        renderLoginPage();
 
         const loginPage = screen.getByTestId('login-page');
-        expect(loginPage).toHaveTextContent('Error fetching user with the credentials provided...');
-        expect(loginPage).toHaveTextContent('Ensure your credentials are correct and try again');
+        expect(loginPage).not.toHaveTextContent('I\'m sorry, the credentials provided did not match our records...');
+        expect(loginPage).not.toHaveTextContent('Ensure your credentials are correct and try again');
+
+        await userEvent.type(await screen.findByLabelText('Username:'), 'johndoe');
+        await userEvent.type(screen.getByLabelText('Password:'), 'cmplxpswd');
+        await userEvent.click(screen.getByRole('button', {name: 'Sign in'}));
+
+        const updatedLoginPage = screen.getByTestId('login-page');
+
+        expect(updatedLoginPage).toHaveTextContent('I\'m sorry, the credentials provided did not match our records...');
+        expect(updatedLoginPage).toHaveTextContent('Ensure your credentials are correct and try again');
+    });
+
+
+    it('handles when a new username is unavailable', async () => {
+        vi.spyOn(UserApi, 'registerWithCredentials').mockImplementation((credentials) =>
+            Promise.reject({status: 404}));
+
+        renderLoginPage();
+
+        const loginPage = screen.getByTestId('login-page');
+        expect(loginPage).not.toHaveTextContent('I\'m sorry, that username is already taken.');
+        expect(loginPage).not.toHaveTextContent(
+            'Please click the sign in button if you meant to sign in or try a new username if you meant to register.'
+        );
+
+        await userEvent.type(await screen.findByLabelText('Username:'), 'willIam');
+        await userEvent.type(screen.getByLabelText('Password:'), 'blackIpeas');
+        await userEvent.click(screen.getByRole('button', {name: 'Create an Account'}));
+
+        const updatedLoginPage = screen.getByTestId('login-page');
+
+        expect(updatedLoginPage).toHaveTextContent('I\'m sorry, that username is already taken.');
+        expect(updatedLoginPage).toHaveTextContent(
+            'Please click the sign in button if you meant to sign in or try a new username if you meant to register.'
+        );
     });
 
 });
