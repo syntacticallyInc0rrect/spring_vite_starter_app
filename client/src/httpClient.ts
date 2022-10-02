@@ -98,7 +98,7 @@ const httpClient: HttpClient = {
                 Accept: 'application/json',
             }),
             ...options,
-            method: 'POST',
+            method: 'PUT',
             body: JSON.stringify(body),
         })
             .then(handleResponse)

@@ -15,7 +15,13 @@ describe('LoginPage', () => {
         data: {username: credentials.username}
     }));
 
-    const renderLoginPage = () => render(<LoginPage setCurrentUser={(_user) => {}} />);
+    const renderLoginPage = (trueOrFalse = false) => render(
+        <LoginPage
+            setCurrentUser={(_user) => {}}
+            failedLoginAttempt={trueOrFalse}
+            setFailedLoginAttempt={(_trueOrFalse) => {}}
+        />
+    );
 
     it('allows a user to login', async () => {
         renderLoginPage();
@@ -41,7 +47,8 @@ describe('LoginPage', () => {
         renderLoginPage();
 
         await userEvent.click(screen.getByRole('button', {name: 'Create an Account'}));
-        await userEvent.type(await screen.findByLabelText('Username:'), 'janedoe');
+        expect(await screen.findByText('warning: password is transferred and stored as plain text. DO NOT use a sensitive password!')).toBeInTheDocument();
+        await userEvent.type(screen.getByLabelText('Username:'), 'janedoe');
         await userEvent.type(screen.getByLabelText('Password:'), 'passwordispassword');
         await userEvent.click(screen.getByRole('button', {name: 'SUBMIT'}));
 
@@ -52,27 +59,11 @@ describe('LoginPage', () => {
     });
 
     it('handles when a user is not found', async () => {
-        vi.spyOn(UserApi, 'loginWithCredentials').mockImplementationOnce((credentials) => Promise.resolve({
-            status: 404
-        }));
-
-        renderLoginPage();
-
-        await userEvent.click(screen.getByRole('button', {name: 'Sign in'}));
-        await userEvent.type(await screen.findByLabelText('Username:'), 'notARealUser');
-        await userEvent.type(screen.getByLabelText('Password:'), 'something');
-        await userEvent.click(screen.getByRole('button', {name: 'SUBMIT'}));
-
-        await waitFor(() => expect(loginWithCredentials).toHaveBeenCalledTimes(1));
-
-        expect(loginWithCredentials).toHaveBeenCalledWith({username: 'notARealUser', password: 'something'});
+        renderLoginPage(true);
 
         const loginPage = screen.getByTestId('login-page');
         expect(loginPage).toHaveTextContent('Error fetching user with the credentials provided...');
         expect(loginPage).toHaveTextContent('Ensure your credentials are correct and try again');
-
-        expect(screen.getByLabelText('Username:')).toHaveValue('notARealUser');
-        expect(screen.getByLabelText('Password:')).toHaveValue('something');
     });
 
 });

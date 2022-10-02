@@ -1,12 +1,32 @@
-import {useState} from 'react'
+import {useEffect, useState} from 'react'
 import reactLogo from './assets/react.svg'
 import './App.css'
 import {User} from "./userApi";
 import LoginPage from "./LoginPage";
 
 const App = () => {
-    const [count, setCount] = useState(0);
-    const [currentUser, setCurrentUser] = useState<User | 'isInLoadingState' | 'noCurrentUser'>('noCurrentUser');
+    const getInitialCurrentUserState = (): User | 'isInLoadingState' | 'noCurrentUser' => {
+        if (!localStorage.getItem('currentUserString') || localStorage.getItem('currentUserString') === 'noCurrentUser') {
+            return 'noCurrentUser';
+        } else if (localStorage.getItem('currentUserString') === 'isInLoadingState') {
+            return 'isInLoadingState';
+        } else {
+            return {username: localStorage.getItem('currentUserString')} as User;
+        }
+    };
+
+    const setLocalStorageForCurrentUser = (currentState: User | 'isInLoadingState' | 'noCurrentUser'): void => {
+        if (typeof currentState === 'string') localStorage.setItem('currentUserString', currentState);
+        else localStorage.setItem('currentUserString', currentState.username);
+    };
+
+    const [currentUser, setCurrentUser] = useState<User | 'isInLoadingState' | 'noCurrentUser'>(getInitialCurrentUserState());
+    const [failedLoginAttempt, setFailedLoginAttempt] = useState<boolean>(false);
+
+
+    useEffect(() => {
+        setLocalStorageForCurrentUser(currentUser);
+    }, [currentUser]);
 
     if (currentUser === 'isInLoadingState') return (
         <div>
@@ -22,23 +42,26 @@ const App = () => {
         </div>
     );
 
-    if (currentUser === 'noCurrentUser') return <LoginPage setCurrentUser={setCurrentUser}/>;
+    if (currentUser === 'noCurrentUser') return (
+        <LoginPage
+            setCurrentUser={setCurrentUser}
+            failedLoginAttempt={failedLoginAttempt}
+            setFailedLoginAttempt={setFailedLoginAttempt}
+        />
+    );
 
     return (
         <div className="App">
-            <h1>Vite + React</h1>
+            <h1>Midterm</h1>
             <h2>{`Hello ${currentUser.username}!`}</h2>
             <div className="card">
-                <button onClick={() => setCount((count) => count + 1)}>
-                    count is {count}
+                <button onClick={() => {
+                    localStorage.clear();
+                    setCurrentUser('noCurrentUser');
+                }}>
+                    SIGN OUT
                 </button>
-                <p>
-                    Edit <code>src/App.tsx</code> and save to test HMR
-                </p>
             </div>
-            <p className="read-the-docs">
-                Click on the Vite and React logos to learn more
-            </p>
         </div>
     )
 }

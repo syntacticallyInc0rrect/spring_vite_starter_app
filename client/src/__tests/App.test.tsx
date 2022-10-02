@@ -12,21 +12,33 @@ describe('App', () => {
         expect(await screen.findByRole('button', {name: 'Sign in'})).toBeInTheDocument();
     });
 
-    it('displays current user after successful login', async () => {
-        vi.spyOn(UserApi, 'loginWithCredentials').mockImplementation((credentials) => Promise.resolve({
-            status: 200,
-            data: {username: credentials.username}
-        }));
+    it('allows user to logout', async () => {
+        vi.spyOn(UserApi, 'loginWithCredentials').mockImplementation((credentials) =>
+            Promise.resolve({username: credentials.username}));
+
         render(<App/>);
+
+        expect(screen.queryByRole('button', {name: 'SIGN OUT'})).toBeNull();
 
         await userEvent.click(screen.getByRole('button', {name: 'Sign in'}));
         await userEvent.type(await screen.findByLabelText('Username:'), 'johndoe');
         await userEvent.type(screen.getByLabelText('Password:'), 'cmplxpswd');
         await userEvent.click(screen.getByRole('button', {name: 'SUBMIT'}));
 
-        waitFor(() => expect(loginWithCredentials).toHaveBeenCalledWith({username: 'johndoe', password: 'cmplxpswd'}));
+        await waitFor(() => expect(loginWithCredentials).toHaveBeenCalledWith({username: 'johndoe', password: 'cmplxpswd'}));
 
         expect(screen.getByText('Hello johndoe!')).toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Sign in'})).toBeNull();
+        expect(screen.queryByRole('button', {name: 'Create an Account'})).toBeNull();
+
+        await userEvent.click(screen.getByRole('button', {name: 'SIGN OUT'}));
+
+        await waitFor(() => {
+            expect(screen.queryByRole('button', {name: 'SIGN OUT'})).toBeNull();
+        });
+        expect(screen.queryByText('Hello johndoe!')).toBeNull();
+        expect(screen.getByRole('button', {name: 'Sign in'})).toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'Create an Account'})).toBeInTheDocument();
     });
 
 });

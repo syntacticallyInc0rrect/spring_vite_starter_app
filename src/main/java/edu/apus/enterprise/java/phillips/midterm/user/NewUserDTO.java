@@ -14,6 +14,6 @@ public class NewUserDTO {
     private String password;
 
     public User toUser() {
-        return new User(0L, this.username, this.password);
+        return User.builder().username(this.username).password(this.password).build();
     }
 }

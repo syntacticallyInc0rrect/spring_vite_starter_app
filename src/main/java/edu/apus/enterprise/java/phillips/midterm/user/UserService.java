@@ -18,8 +18,13 @@ public class UserService {
     }
 
     Optional<UserDTO> saveNewUser(NewUserDTO newUserDTO) {
-        System.out.println("inside service when I should not be");
-        return Optional.empty();
+        Optional<User> maybeUser =
+                userRepository.findByUsernameAndPassword(newUserDTO.getUsername(), newUserDTO.getPassword());
+        if (maybeUser.isEmpty()) {
+            return Optional.of(userRepository.save(newUserDTO.toUser()).toUserDTO());
+        } else {
+            return Optional.empty();
+        }
     }
 
 }
