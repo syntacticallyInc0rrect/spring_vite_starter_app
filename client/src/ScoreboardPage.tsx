@@ -22,8 +22,28 @@ export const ScoreboardPage = ({currentUser}: PageProps) => {
         return Math.ceil(gamesFinished / totalGamesStarted * 100);
     };
 
+    const displayTimeInHourMinuteSecondFormat = (num: number): string => {
+        if (num < 60) return `${num}s`;
+        if (num < 60 * 60) {
+            const min = Math.floor(num / 60);
+            const sec = num - (min * 60);
+            return `${min}m ${sec}s`;
+        }
+        if (num < 60 * 60 * 24) {
+            const hr = Math.floor(num / 60 / 60);
+            const min = Math.floor((num - (hr * 60 * 60)) / 60);
+            const sec = num - ((hr * 60 * 60) + (min * 60));
+            return `${hr}h ${min}m ${sec}s`
+        } else {
+            return '> 24 hours'
+        }
+    };
+
     return (
-            <div className="overflow-hidden bg-white shadow rounded-lg m-16 lg:m-32">
+            <div
+                className="overflow-hidden bg-white shadow rounded-lg m-16 lg:m-32"
+                data-testid='scoreboard-page'
+            >
                 <div className="min-h-full overflow-hidden p-2 bg-indigo-600">
                 <div className="px-4 py-5 sm:px-6">
                     <h3 className="text-lg font-bold font-medium leading-6 text-gray-900">Username</h3>
@@ -49,11 +69,11 @@ export const ScoreboardPage = ({currentUser}: PageProps) => {
                         </div>
                         <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                             <dt className="text-sm font-medium text-gray-500">Best Time</dt>
-                            <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">{userScoreboard.bestTime}s</dd>
+                            <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">{displayTimeInHourMinuteSecondFormat(userScoreboard.bestTime)}</dd>
                         </div>
                         <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                             <dt className="text-sm font-medium text-gray-500">Average Time</dt>
-                            <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">{userScoreboard.averageTime}s</dd>
+                            <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">{displayTimeInHourMinuteSecondFormat(userScoreboard.averageTime)}</dd>
                         </div>
                     </dl>
                 </div>

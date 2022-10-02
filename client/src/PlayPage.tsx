@@ -5,8 +5,11 @@ import {
     GiBearFace,
     GiCyborgFace,
     GiDoctorFace,
-    GiDoubleFaceMask, GiSaberToothedCatHead, GiWitchFace,
-    GiWizardFace, GiWomanElfFace,
+    GiDoubleFaceMask,
+    GiSaberToothedCatHead,
+    GiWitchFace,
+    GiWizardFace,
+    GiWomanElfFace,
     GoOctoface
 } from "react-icons/all";
 import {saveUserFinishTime, saveUserStartTime} from "./userApi";
@@ -197,9 +200,16 @@ export const PlayPage = ({currentUser}: PageProps) => {
     };
 
     if (gameStatus === 'isInErrorState') return <></>;
-    if (gameStatus === 'isComplete') return <>
-        <button onClick={() => setGameStatus('isInProgress')}>Play Again?</button>
-    </>;
+    if (gameStatus === 'isComplete') return (
+        <div className="overflow-hidden bg-white shadow rounded-lg md:m-64 m-32 md:124">
+            <button
+                onClick={() => setGameStatus('isInProgress')}
+                className="group relative flex w-full justify-center rounded-md border border-transparent bg-indigo-600 lg:py-32 md:py-24 py-16 px-4 lg:text-6xl md:text-3xl text-lg text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+            >
+                Play Again?
+            </button>
+        </div>
+    );
 
     else
         return (
