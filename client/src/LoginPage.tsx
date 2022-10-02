@@ -2,7 +2,7 @@ import {Dispatch, SetStateAction, useState} from "react";
 import {loginWithCredentials, registerWithCredentials, User, UserCredentials} from "./userApi";
 
 type LoginPageProps = {
-    setCurrentUser: Dispatch<SetStateAction<User | "isInLoadingState" | "noCurrentUser">>;
+    setCurrentUser: Dispatch<SetStateAction<User | "noCurrentUser">>;
 }
 
 const LoginPage = ({setCurrentUser}: LoginPageProps) => {
@@ -21,19 +21,16 @@ const LoginPage = ({setCurrentUser}: LoginPageProps) => {
         };
 
         const onSubmitFn = (isRegistration: boolean) => {
-            setCurrentUser('isInLoadingState');
             isRegistration ?
                 registerWithCredentials(credentials)
                     .then(handleResponse)
                     .catch((_error: any) => {
                         setFormStatus('unavailableUsername');
-                        setCurrentUser('noCurrentUser');
                     }) :
                 loginWithCredentials(credentials)
                     .then(handleResponse)
                     .catch((_error: any) => {
                         setFormStatus('incorrectLoginCredentials');
-                        setCurrentUser('noCurrentUser');
                     });
         };
 

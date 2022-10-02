@@ -12,7 +12,7 @@ export type UserCredentials = {
 
 export type UserScoreboard = {
     username: string;
-    totalGamesPlayed: number;
+    totalGamesFinished: number;
     totalGamesAbandoned: number;
     bestTime: number;
     averageTime: number;

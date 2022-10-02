@@ -1,4 +1,4 @@
-import {ScoreboardPage} from '../BodyElement';
+import {ScoreboardPage} from '../ScoreboardPage';
 import {render, screen, waitFor} from "@testing-library/react";
 import {describe, expect, it, vi} from "vitest";
 import * as UserApi from '../userApi';
@@ -10,7 +10,7 @@ describe('ScoreboardPage', () => {
     it('displays user scoreboard statistic once they load from server', async () => {
         const testUserStats: UserScoreboard = {
             username: testUser.username,
-            totalGamesPlayed: 15,
+            totalGamesFinished: 20,
             totalGamesAbandoned: 10,
             bestTime: 45,
             averageTime: 72,
@@ -25,9 +25,9 @@ describe('ScoreboardPage', () => {
         await waitFor(() => expect(screen.queryByTestId('scoreboard-loading-page')).toBeNull());
 
         const scoreboardPage = screen.getByTestId('scoreboard-page');
-        expect(scoreboardPage).toHaveTextContent(`Total Games Played: ${testUserStats.totalGamesPlayed}`);
+        expect(scoreboardPage).toHaveTextContent(`Total Games Played: ${testUserStats.totalGamesFinished}`);
         expect(scoreboardPage).toHaveTextContent(`Total Games Abandoned: ${testUserStats.totalGamesAbandoned}`);
-        expect(scoreboardPage).toHaveTextContent(`Percentage of Games Completed: ${testUserStats.totalGamesPlayed / (testUserStats.totalGamesPlayed + testUserStats.totalGamesAbandoned)}%`);
+        expect(scoreboardPage).toHaveTextContent('Percentage of Games Completed: 67%');
         expect(scoreboardPage).toHaveTextContent(`${testUserStats.username}'s Best Time: ${testUserStats.bestTime}`);
         expect(scoreboardPage).toHaveTextContent(`${testUserStats.username}'s Average Time: ${testUserStats.averageTime}`);
     });

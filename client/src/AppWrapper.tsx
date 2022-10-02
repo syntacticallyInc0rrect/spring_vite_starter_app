@@ -4,22 +4,20 @@ import App from "./App";
 import {FaUserAlt} from "react-icons/all";
 
 const AppWrapper = () => {
-    const getInitialCurrentUserState = (): User | 'isInLoadingState' | 'noCurrentUser' => {
+    const getInitialCurrentUserState = (): User | 'noCurrentUser' => {
         if (!localStorage.getItem('currentUserString') || localStorage.getItem('currentUserString') === 'noCurrentUser') {
             return 'noCurrentUser';
-        } else if (localStorage.getItem('currentUserString') === 'isInLoadingState') {
-            return 'isInLoadingState';
         } else {
             return {username: localStorage.getItem('currentUserString')} as User;
         }
     };
 
-    const setLocalStorageForCurrentUser = (currentState: User | 'isInLoadingState' | 'noCurrentUser'): void => {
+    const setLocalStorageForCurrentUser = (currentState: User | 'noCurrentUser'): void => {
         if (typeof currentState === 'string') localStorage.setItem('currentUserString', currentState);
         else localStorage.setItem('currentUserString', currentState.username);
     };
 
-    const [currentUser, setCurrentUser] = useState<User | 'isInLoadingState' | 'noCurrentUser'>(getInitialCurrentUserState());
+    const [currentUser, setCurrentUser] = useState<User | 'noCurrentUser'>(getInitialCurrentUserState());
 
     useEffect(() => {
         setLocalStorageForCurrentUser(currentUser);
@@ -40,14 +38,14 @@ const AppWrapper = () => {
     return (
         <div className="min-h-full">
             <nav className="bg-gray-800">
-                <div className="mx-auto w-full px-4 sm:px-6 lg:px-8">
+                <div className="mx-auto w-full px-4 px-6 lg:px-8">
                     <div className="flex h-16 items-center justify-between">
                         <div className="flex items-center">
                             <div className="flex-shrink-0">
                                 <img src="/vite.svg" className="logo" alt="Vite logo"/>
                             </div>
-                            <div className="hidden md:block">
-                                {currentUser !== 'noCurrentUser' && currentUser !== 'isInLoadingState' && (
+                            <div>
+                                {currentUser !== 'noCurrentUser' && (
                                     <div className="ml-10 flex items-baseline space-x-4">
                                         <button
                                             className={getNavigationClassName(false)}
@@ -67,11 +65,11 @@ const AppWrapper = () => {
                                 )}
                             </div>
                         </div>
-                        <div className="hidden md:block">
-                            {currentUser !== 'isInLoadingState' && currentUser !== 'noCurrentUser' && (
+                        <div>
+                            {currentUser !== 'noCurrentUser' && (
                                 <div className="ml-4 flex items-center md:ml-6">
                                     <FaUserAlt className="text-gray-300 mr-2"/>
-                                    <p className="text-center text-sm text-gray-300 mr-6">{`Welcome, ${currentUser.username}`}</p>
+                                    <p className="hidden md:block text-center text-sm text-gray-300 mr-6">{`Welcome, ${currentUser.username}`}</p>
                                     <button type="button"
                                             className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
                                             onClick={() => {
@@ -84,13 +82,6 @@ const AppWrapper = () => {
                                 </div>
                             )}
                         </div>
-                        <div className="-mr-2 flex md:hidden">
-                            <button type="button"
-                                    className="inline-flex items-center justify-center rounded-md bg-gray-800 p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
-                                    aria-controls="mobile-menu" aria-expanded="false">
-                                <span className="sr-only">Open main menu</span>
-                            </button>
-                        </div>
                     </div>
                 </div>
             </nav>
@@ -98,7 +89,7 @@ const AppWrapper = () => {
             <header className="bg-white shadow">
                 <div className="mx-auto w-full py-6 px-4 sm:px-6 lg:px-8">
                     <h1 className="text-3xl font-bold tracking-tight text-gray-900">
-                        {currentUser !== 'noCurrentUser' && currentUser !== 'isInLoadingState' ? isOnScoreboardPage ? 'Scoreboard' : 'Play' : 'Welcome'}
+                        {currentUser !== 'noCurrentUser' ? isOnScoreboardPage ? 'Scoreboard' : 'Play' : 'Welcome'}
                     </h1>
                 </div>
             </header>

@@ -1,4 +1,4 @@
-import {PlayPage} from '../BodyElement';
+import {PlayPage} from '../PlayPage';
 import {render, screen, waitFor} from "@testing-library/react";
 import {describe, expect, it, vi} from "vitest";
 import * as UserApi from "../userApi";

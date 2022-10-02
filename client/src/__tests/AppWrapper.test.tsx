@@ -8,7 +8,7 @@ import userEvent from "@testing-library/user-event";
 describe('AppWrapper', () => {
     const userScoreboard: UserScoreboard = {
         username: 'someone',
-        totalGamesPlayed: 15,
+        totalGamesFinished: 15,
         totalGamesAbandoned: 10,
         bestTime: 42,
         averageTime: 71,
