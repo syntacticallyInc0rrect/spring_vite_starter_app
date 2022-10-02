@@ -1,16 +1,16 @@
 package edu.apus.enterprise.java.phillips.midterm.user;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Builder
 public class NewUserDTO {
+    @NonNull
     private String username;
+
+    @NonNull
     private String password;
 
     public User toUser() {

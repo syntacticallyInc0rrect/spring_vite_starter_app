@@ -16,5 +16,5 @@ spring:
     password: password
   jpa:
     database: mysql
-    hibernate:
-      ddl-auto: create
+  flyway:
+    baseline-on-migrate: true
